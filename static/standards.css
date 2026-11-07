@@ -1,0 +1,48 @@
+/* WAYZA standards layer: accessibility, feedback states, motion, touch, PWA. Loaded after style.css. */
+:root{--focus:#1a73e8;--elev-1:0 1px 2px rgba(0,0,0,.08),0 1px 3px rgba(0,0,0,.1);--elev-2:0 2px 6px rgba(0,0,0,.12),0 4px 12px rgba(0,0,0,.08)}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{-webkit-tap-highlight-color:transparent;overscroll-behavior-y:none;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:6px}
+#main:focus{outline:none}
+.skip-link{position:fixed;left:12px;top:-60px;z-index:2000;background:#0c5138;color:#fff;padding:10px 16px;border-radius:10px;text-decoration:none;transition:top .15s}
+.skip-link:focus{top:12px}
+.offline-bar{position:sticky;top:0;z-index:1999;background:#7a4b00;color:#fff;text-align:center;padding:8px 12px;font-size:14px}
+.offline-bar[hidden]{display:none}
+/* Material-style state layer + ripple */
+.btn,.side-link,.mobile-nav a,.icon-btn,.account-btn{position:relative;overflow:hidden;transition:box-shadow .2s,background-color .2s,transform .1s}
+.btn:active,.icon-btn:active{transform:scale(.98)}
+.btn-success{box-shadow:var(--elev-1)}.btn-success:hover{box-shadow:var(--elev-2)}
+.ripple{position:absolute;border-radius:50%;background:currentColor;opacity:.22;transform:scale(0);animation:rip .55s ease-out;pointer-events:none}
+@keyframes rip{to{transform:scale(3.2);opacity:0}}
+/* skeleton loading */
+.skel{background:linear-gradient(90deg,rgba(128,128,128,.14) 25%,rgba(128,128,128,.28) 37%,rgba(128,128,128,.14) 63%);background-size:400% 100%;animation:shim 1.3s ease infinite;border-radius:10px}
+.skel-card{border:1px solid var(--line,#e2e9e4);border-radius:18px;padding:12px;display:grid;gap:10px}
+.skel-img{height:150px}.skel-line{height:14px}.skel-line.w60{width:60%}
+@keyframes shim{0%{background-position:100% 50%}100%{background-position:0 50%}}
+[aria-busy=true]{cursor:progress}
+/* touch targets and mobile comfort */
+@media(pointer:coarse){.btn,.form-control,.form-select,.mobile-nav a,.icon-btn{min-height:44px}.mobile-nav a{justify-content:center}}
+.topbar{padding-top:env(safe-area-inset-top,0)}
+img{max-width:100%;height:auto}
+/* respect user preferences */
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+@media(prefers-contrast:more){:root{--line:#6c7d73}.btn-outline-success{border-width:2px}}
+@media print{.topbar,.sidebar,.mobile-nav,#toasts,.offline-bar{display:none!important}.main-content{width:100%!important;padding:0!important}}
+
+/* Topbar: keep one tidy row on phones */
+.topbar .account-btn{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.topbar .brand small,.topbar .brand strong{white-space:nowrap}
+#installBtn{white-space:nowrap}
+@media(max-width:767px){
+  .topbar{gap:8px;padding-left:12px;padding-right:12px}
+  .topbar .brand{flex:1 1 auto;min-width:0;gap:8px}
+  .topbar .brand small{display:none}
+  .topbar-actions{flex:0 0 auto;gap:6px}
+  .topbar-actions a[href="/admin"]{display:none}
+  #installBtn{width:38px;height:38px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:11px}
+  #installBtn[hidden]{display:none}
+  #installBtn .install-label{display:none}
+  .topbar .account-btn{max-width:112px;height:38px;padding:0 12px;font-size:12px}
+  .topbar .account-btn .badge{font-size:10px;padding:3px 6px}
+}
+@media(max-width:360px){.topbar .brand strong{font-size:15px}.topbar .account-btn{max-width:92px}}

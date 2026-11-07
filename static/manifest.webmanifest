@@ -1,0 +1,3 @@
+{"name":"WAYZA — Every Journey, Made Easier","short_name":"WAYZA","description":"Lagos bus-stop alerts, routes and local marketplace.","start_url":"/#ride","scope":"/","display":"standalone","orientation":"portrait","background_color":"#f4f7f5","theme_color":"#0c5138",
+"icons":[{"src":"/static/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any"},{"src":"/static/icon.svg","sizes":"any","type":"image/svg+xml","purpose":"maskable"}],
+"shortcuts":[{"name":"Find a ride","url":"/#ride"},{"name":"Marketplace","url":"/#market"}]}

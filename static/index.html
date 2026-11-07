@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0c5138">
+  <meta name="description" content="WAYZA helps you get around Lagos: live bus-stop alerts, routes and fares, and a marketplace of local businesses near your stop.">
+  <meta property="og:title" content="WAYZA — Every Journey, Made Easier"><meta property="og:type" content="website">
+  <meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="WAYZA">
+  <link rel="manifest" href="/static/manifest.webmanifest">
+  <link rel="icon" href="/static/icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="/static/icon.svg">
+  <title>WAYZA — Every Journey, Made Easier</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/standards.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<div id="offlineBar" class="offline-bar" role="status" hidden>You're offline — showing what's already loaded.</div>
+<div id="sr" class="visually-hidden" role="status" aria-live="polite"></div>
+<noscript><p style="padding:24px">WAYZA needs JavaScript to run. Please enable it and reload.</p></noscript>
+<header class="topbar" role="banner">
+  <a class="brand" href="#ride" aria-label="WAYZA home">
+    <span class="brand-mark">W</span>
+    <span><strong>WAYZA</strong><small>MOVE SMARTER</small></span>
+  </a>
+  <div class="topbar-center"><span class="live-dot"></span> Every journey, made easier</div>
+  <div class="topbar-actions"><a class="btn btn-sm btn-outline-success" href="/admin">Admin</a>
+    <button class="btn btn-sm btn-success" id="installBtn" type="button" aria-label="Install app" title="Install app" hidden><i class="fa-solid fa-download"></i><span class="install-label"> Install app</span></button>
+    <button class="icon-btn" id="themeBtn" type="button" aria-label="Toggle dark mode" aria-pressed="false" title="Toggle dark mode">◐</button>
+    <button class="account-btn" onclick="go('account')" id="acctBtn">Sign in <span>↗</span></button>
+  </div>
+</header>
+
+<div class="app-shell">
+  <aside class="sidebar" aria-label="Primary">
+    <div class="side-label">EXPLORE</div>
+    <a href="#ride" class="side-link active" data-pg="ride"><i class="fa-solid fa-location-arrow"></i> Find a ride</a>
+    <a href="#routes" class="side-link" data-pg="routes"><i class="fa-solid fa-route"></i> Bus routes</a>
+    <a href="#market" class="side-link" data-pg="market"><i class="fa-solid fa-store"></i> Local marketplace</a>
+    <a href="#msgs" class="side-link" data-pg="msgs"><i class="fa-solid fa-comments"></i> Messages</a>
+    <div class="side-divider"></div>
+    <div class="side-label">YOUR SPACE</div>
+    <a href="#account" class="side-link" data-pg="account"><i class="fa-solid fa-circle-user"></i> Account</a>
+    <div class="sidebar-note">
+      <div class="note-icon">✦</div>
+      <strong>Move smarter.</strong>
+      <p>Get closer to your destination with helpful stop alerts and local discoveries.</p>
+    </div>
+    <div class="sidebar-foot">MADE FOR LAGOS <span>•</span> © 2026</div>
+  </aside>
+
+  <main class="main-content" id="main" tabindex="-1">
+    <div class="page-heading">
+      <div>
+        <div class="eyebrow"><i class="fa-solid fa-hand-sparkles"></i> WELCOME TO WAYZA</div>
+        <h1>Your city. <em>Your route.</em></h1>
+        <p>Find your way around Lagos, know when to get down, and discover businesses along the way.</p>
+      </div>
+      <div class="heading-pill"><span class="live-dot"></span> Lagos transport guide</div>
+    </div>
+
+    <section id="pg-ride" class="pg">
+      <div class="ride-layout">
+        <div class="ride-main">
+          <div class="section-card trip-card">
+            <div class="card-kicker"><span class="kicker-icon">⌖</span> PLAN YOUR JOURNEY</div>
+            <h2>Where are you headed?</h2>
+            <p class="muted-copy">Choose your route and the stop where you want to get down.</p>
+            <div class="trip-fields">
+              <label class="field-wrap"><span>YOUR BUS ROUTE</span><select id="rsel" class="form-select"><option value="">Choose a route…</option></select></label>
+              <label class="field-wrap"><span>GETTING DOWN AT</span><select id="dsel" class="form-select"><option value="">Where are you getting down?</option></select></label>
+            </div>
+            <div class="trip-actions">
+              <button class="btn btn-success" id="setTrip">Set my trip <span>→</span></button>
+              <button class="btn btn-light" id="clrTrip">Clear</button>
+            </div>
+            <div id="tripInfo" class="trip-info"></div>
+          </div>
+
+          <div class="section-card alert-card">
+            <div class="alert-top">
+              <div><div class="card-kicker"><span class="kicker-icon">◉</span> LIVE BUS-STOP ALERTS</div><h2>Never miss your stop.</h2></div>
+              <span class="voice-chip">♫ Voice guide</span>
+            </div>
+            <div class="tracking-panel">
+              <div class="tracking-status"><span class="pulse-dot"></span><span id="st">Not tracking</span></div>
+              <div id="cur" class="tracking-title">Ready when you are</div>
+              <div id="det" class="tracking-description">Start GPS tracking and we’ll help you identify nearby Lagos bus stops.</div>
+              <div class="tracking-actions">
+                <button class="btn btn-success" id="go"><span>⌖</span> Start tracking</button>
+                <button class="btn btn-outline-success" id="demo">Try demo ride</button>
+                <button class="btn btn-outline-secondary" id="sayNow">🔊 Where am I?</button>
+                <button class="btn btn-outline-secondary" id="vt">Voice: On</button>
+              </div>
+              <div class="voice-settings">
+                <label for="voiceSelect">Voice style</label>
+                <select id="voiceSelect" class="form-select" aria-label="Choose voice style">
+                  <option value="female-ng">Female voice · Nigerian English preferred</option>
+                  <option value="nigeria">Nigerian English · any available voice</option>
+                  <option value="female">Female voice · English</option>
+                  <option value="british">Female voice · British English</option>
+                  <option value="american">Female voice · American English</option>
+                  <option value="system">Device default voice</option>
+                </select>
+                <small id="voiceStatus">Looking for voices installed on this device…</small>
+              </div>
+              <button class="suggest-link" id="addStop">＋ Suggest a bus stop at my location</button>
+            </div>
+          </div>
+
+          <div class="section-card nearby-card">
+            <div class="section-title-row"><div><div class="card-kicker">AROUND YOU</div><h3>Nearby bus stops</h3></div><span class="soft-tag">Lagos</span></div>
+            <div id="nearby" class="nearby-list small"></div>
+          </div>
+        </div>
+        <div class="ride-map-column">
+          <div class="map-heading"><div><span class="map-pin">⌖</span><strong>Live route map</strong></div><span class="map-caption">Explore stops & routes</span></div>
+          <div id="mapWrap"><div id="map"></div></div>
+          <div class="map-legend"><span><i class="legend-stop"></i> Bus stops</span><span><i class="legend-route"></i> Selected route</span><span><i class="legend-you"></i> Your location</span></div>
+          <div class="map-tip"><span>✦</span><div><strong>Stay in the know</strong><p>Allow location access to receive nearby stop alerts while the page is open.</p></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="pg-routes" class="pg d-none">
+      <div class="section-card page-tool-card route-intro"><div class="card-kicker"><i class="fa-solid fa-route"></i> GETTING AROUND LAGOS</div><div class="route-intro-row"><div><h2>Explore bus routes</h2><p class="muted-copy">Find a corridor, check its stops and estimate your fare.</p></div><div class="route-total"><strong id="routeCount">27</strong><span>route options</span></div></div><div class="route-search-wrap"><i class="fa-solid fa-magnifying-glass"></i><input id="rq" class="form-control search-control" placeholder="Search by route, stop or neighbourhood…"></div><div class="route-disclaimer"><i class="fa-solid fa-circle-info"></i> Route paths, stop coordinates and fares are starter estimates. Confirm the current route and fare with local transport operators.</div></div>
+      <div id="routeList" class="route-results"></div>
+    </section>
+
+    <section id="pg-market" class="pg d-none">
+      <div class="market-hero">
+        <div class="market-hero-copy">
+          <span class="market-eyebrow"><i class="fa-solid fa-bag-shopping"></i> THE WAYZA MARKETPLACE</span>
+          <h2>Good finds. <span>Right around your route.</span></h2>
+          <p>Discover trusted local shops, services and products around Lagos bus stops — and connect directly with the people behind them.</p>
+          <div class="market-hero-points"><span><i class="fa-solid fa-location-dot"></i> Near your stops</span><span><i class="fa-solid fa-store"></i> Local businesses</span><span><i class="fa-solid fa-comments"></i> Direct contact</span></div>
+        </div>
+        <div class="market-hero-art" aria-hidden="true"><div class="market-art-circle"><i class="fa-solid fa-basket-shopping"></i></div><span class="market-float market-float-one"><i class="fa-solid fa-bag-shopping"></i></span><span class="market-float market-float-two"><i class="fa-solid fa-location-dot"></i></span><span class="market-float market-float-three"><i class="fa-solid fa-tag"></i></span></div>
+      </div>
+      <div class="market-toolbar">
+        <div class="market-toolbar-heading"><div><span class="market-section-kicker">EXPLORE THE NEIGHBOURHOOD</span><h3>Find your next favourite</h3><p>Search shops, services and products in your area.</p></div><span class="market-trust"><i class="fa-solid fa-shield-halved"></i> Shop local with confidence</span></div>
+        <div class="market-filters">
+          <div class="market-search"><i class="fa-solid fa-magnifying-glass"></i><input id="mq" class="form-control" placeholder="What are you looking for today?"></div>
+          <select id="mcat" class="form-select"><option value="">All categories</option></select>
+          <select id="mstop" class="form-select"><option value="">Any bus stop</option></select>
+          <button class="btn btn-outline-success" id="mnear"><i class="fa-solid fa-location-crosshairs"></i> Near me</button>
+        </div>
+      </div>
+      <div class="market-results-heading"><div><span class="market-section-kicker">LOCAL DISCOVERIES</span><h3>Businesses to explore</h3></div><span class="market-results-note"><i class="fa-solid fa-images"></i> Photos shown on every listing</span></div>
+      <div id="mlist" class="row g-3 market-results"></div>
+    </section>
+
+    <section id="pg-msgs" class="pg d-none"><div class="section-card page-tool-card"><div class="card-kicker">STAY CONNECTED</div><h2>Your conversations</h2><p class="muted-copy">Chat with businesses and manage your conversations.</p><div id="msgs"></div></div></section>
+    <section id="pg-account" class="pg d-none"><div class="account-wrap"><div class="card-kicker">YOUR WAYZA ACCOUNT</div><h2>Welcome aboard.</h2><p class="muted-copy">Sign in or create an account to save your experience.</p><div id="acct"></div></div></section>
+  </main>
+</div>
+
+<div class="modal fade" id="bizModal" tabindex="-1"><div class="modal-dialog modal-dialog-scrollable modal-lg"><div class="modal-content"><div class="modal-body" id="bizBody"></div></div></div></div>
+<div class="toast-container position-fixed top-0 end-0 p-3" id="toasts"></div>
+
+<nav class="mobile-nav" aria-label="Primary mobile">
+  <a class="active" data-pg="ride" href="#ride"><i class="fa-solid fa-location-arrow"></i><small>Ride</small></a>
+  <a data-pg="routes" href="#routes"><i class="fa-solid fa-route"></i><small>Routes</small></a>
+  <a data-pg="market" href="#market"><i class="fa-solid fa-store"></i><small>Market</small></a>
+  <a data-pg="msgs" href="#msgs"><i class="fa-solid fa-comments"></i><small>Chats</small></a>
+  <a data-pg="account" href="#account"><i class="fa-solid fa-circle-user"></i><small>Account</small></a>
+</nav>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/static/app.js"></script>
+<script src="/static/ui.js" defer></script>
+</body>
+</html>
